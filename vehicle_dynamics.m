@@ -2,7 +2,8 @@ function [vx_new, vy_new, vz_new, vxd_new, vyd_new, vzd_new,...
           phi_new, theta_new, psi_new, phid_new, thetad_new, psid_new] ...
         = vehicle_dynamics(vx, vy, vz, vxd, vyd, vzd,...
                            phi, theta, psi, phid, thetad, psid,...
-                           torque, delta)
+                           torque, delta, ...
+                           timespan)
 
 % % states:           vx, vy, vz, vxd, vyd, vzd, phi, theta, psi, phid, thetad, psid
 % %                   vx, velocity in x direction
@@ -33,7 +34,7 @@ Fxfl, Fyfl = magic_tire(alpha_fl, Fzf);
 Fxfr, Fyfr = magic_tire(alpha_fr, Fzf);
 Fxr, Fyr = magic_tire(alpha_r, Fzr);
 
-%STEP4: Calculate XF and XY for each tire
+%STEP4: Calculate XF and XY for each tire (eq.7, 8)
 XFfl = Fxfl * cos(delta) - Fyfl * sin(delta);
 YFfl = Fyfl * cos(delta) + Fxfl * sin(delta);
 XFfr = Fxfr * cos(delta) - Fyfr * sin(delta);
@@ -41,12 +42,26 @@ YFfr = Fyfr * cos(delta) + Fxfr * sin(delta);
 XFr = Fxr * cos(0) - Fyr * sin(0);
 YFr = Fyr * cos(0) + Fxr * sin(0);
 
-%STEP5: Estimate states tbd
+%STEP5a: Calculate double dot of phi, theta, psi (eq.22, 23, 24)
+phidd = (1/Isxx)*((Isyy-Iszz)*thetad*psid-(YFfl+YFfr+YFr)*h);
+thetadd = (1/Isyy)*((Iszz-Isxx)*thetad*psid+Fzr*lr-Fzf*lf+(XFfl+XFfr+XFr)*h);
+phidd = (1/Iszz)*((Isxx-Isyy)*phid*thetad+(XFfl-XFfr)*Tf/2+(YFfl+YFfr)*lf-YFr*lr);  % to add self-aligning torque Mzi
 
-% Mt*(vx_dot + theta_dot*v_z - vy*psi_dot) = X*F_fl + X*F_fr + X*F_r;
-% Mt*(vy_dot + psi_dot*v_x - phi_dot*v_z) = Y*F_fl + Y_fr + Y*F_r;
-% Ms*(vz_dot + psi_dot*v_y - theta_do*v_x) = F*z_fl + F*z_fr + F*z_r;
+%STEP5b: Calculate dot of vx, vy, vz (eq.19, 20, 21)
+vxd_new = (XFfl+XFfr+XFr)/Mt-thetad*vz+psid*vy;
+vyd_new = (YFfl+YFfr+YFr)/Mt-psid*vx+phid*vz;
+vzd_new = (Fzf+Fzr)/Ms-phid*vy+thetad*vx;
 
+%STEP6: Update rest of the states
+vx_new = vx + timespan * vxd_new;
+vy_new = vy + timespan * vyd_new;
+vz_new = vz + timespan * vzd_new;
+phid_new = phid + timespan * phidd;
+thetad_new = thetad + timespan * thetadd;
+psid_new = psid + timespan * psidd;
+phi_new = phi + timespan * phid_new;
+theta_new = theta + timespan * thetad;
+psi_new = psi + timespan * psid;
 
 end
 
