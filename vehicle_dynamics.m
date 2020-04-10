@@ -32,17 +32,19 @@ Fzf = lf*Ms*g/(lf+lr);
 Fzr = lr*Ms*g/(lf+lr);
 
 %STEP3: Use magic tire to calculate Fx and Fy for each tire
-Fxfl, Fyfl = magic_tire(alpha_fl, Fzf);
-Fxfr, Fyfr = magic_tire(alpha_fr, Fzf);
-Fxr, Fyr = magic_tire(alpha_r, Fzr);
+Fxfl = 0;
+Fyfl = magic_tire(alpha_fl, Fzf);
+Fxfr = 0;
+Fyfr = magic_tire(alpha_fr, Fzf);
+Fyr = magic_tire(alpha_r, Fzr);
 
 %STEP4: Calculate XF and XY for each tire (eq.7, 8)
 XFfl = Fxfl * cos(delta) - Fyfl * sin(delta);
 YFfl = Fyfl * cos(delta) + Fxfl * sin(delta);
 XFfr = Fxfr * cos(delta) - Fyfr * sin(delta);
 YFfr = Fyfr * cos(delta) + Fxfr * sin(delta);
-XFr = Fxr * cos(0) - Fyr * sin(0);
-YFr = Fyr * cos(0) + Fxr * sin(0);
+XFr = Fx_r * cos(0) - Fyr * sin(0);
+YFr = Fyr * cos(0) + Fx_r * sin(0);
 
 %STEP5a: Calculate double dot of phi, theta, psi (eq.22, 23, 24)
 phidd = (1/Isxx)*((Isyy-Iszz)*thetad*psid-(YFfl+YFfr+YFr)*h);
