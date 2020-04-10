@@ -19,7 +19,7 @@ Ms = 80; Mt = 89;   % vehicle sprung mass / total mass
 r = 0.6; % [   | ]  % Ratio of front wheel to COG from total vehicle length
 l_tot = 1.5;        % Need to be final
 lf = r*l_tot; lr = (1-r)*l_tot; % distance in x direction: front/rear wheel axis to COG
-Isxx = 0.1; Isyy = 0.2; Iszz = 0.3;  % Inertia to be estimated [EXPERIMENTAL]
+Isxx = 500; Isyy = 1000; Iszz = 2000;  % Inertia to be estimated [EXPERIMENTAL]
                                      % TREAT IT AS A CUBE AND GET ROUGHT Inertai's
 
 %STEP1: Calculate Slip Angle (eq.25)
@@ -43,8 +43,8 @@ XFfl = Fxfl * cos(delta) - Fyfl * sin(delta);
 YFfl = Fyfl * cos(delta) + Fxfl * sin(delta);
 XFfr = Fxfr * cos(delta) - Fyfr * sin(delta);
 YFfr = Fyfr * cos(delta) + Fxfr * sin(delta);
-XFr = Fx_r * cos(0) - Fyr * sin(0);
-YFr = Fyr * cos(0) + Fx_r * sin(0);
+XFr = Fx_r;
+YFr = Fyr;
 
 %STEP5a: Calculate double dot of phi, theta, psi (eq.22, 23, 24)
 phidd = (1/Isxx)*((Isyy-Iszz)*thetad*psid-(YFfl+YFfr+YFr)*h);
