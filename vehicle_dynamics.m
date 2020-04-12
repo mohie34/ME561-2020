@@ -5,6 +5,8 @@ function [X] ...
                            Fx_r, delta)
 
 
+global SIM
+
 % function [vxd, vyd, vzd,...
 %           phidd, thetadd, psidd] ...
 %         = vehicle_dynamics(vx, vy, vz,...
@@ -23,19 +25,19 @@ g = 9.81;           % m/s^2 [FINAL]
 h = 0.4;            % height of COG Affects PHI for roll [EXPERMINTAL]
 Tf = 0.86;          % distance between front wheel [m] [FINAL]
 Ms = 80; Mt = 89;   % vehicle sprung mass / total mass 
-r = 0.6; % [   | ]  % Ratio of front wheel to COG from total vehicle length
-l_tot = 1.5;        % Need to be final
+r = 0.40; % [   | ]  % Ratio of front wheel to COG from total vehicle length
+l_tot = 1.8;        % Need to be final
 lf = r*l_tot; lr = (1-r)*l_tot; % distance in x direction: front/rear wheel axis to COG
-Isxx = 500; Isyy = 1000; Iszz = 2000;  % Inertia to be estimated [EXPERIMENTAL]
+Isxx = 800; Isyy = 1000; Iszz = 4000;  % Inertia to be estimated [EXPERIMENTAL]
                                      % TREAT IT AS A CUBE AND GET ROUGHT Inertai's
 
 %STEP1: Calculate Slip Angle (eq.25)
-alpha_fl = atan((vy+lf*psid)/(vx+Tf*psid/2))-delta; %front left
-alpha_fr = atan((vy+lf*psid)/(vx+Tf*psid/2))-delta; %front right
-alpha_r = atan((vy-lr*psid)/vx); %rear
+alpha_fl = atan2((vy+lf*psid),(vx+Tf*psid/2))-delta; %front left
+alpha_fr = atan2((vy+lf*psid),(vx+Tf*psid/2))-delta; %front right
+alpha_r = atan2((vy-lr*psid),vx); %rear
 
 %STEP2: Calculate Fzf and Fzr (reference: Rob535 HW2)
-Fzf = lf*Ms*g/(lf+lr);
+Fzf = lf*Ms*g/(lf+lr)/2;
 Fzr = lr*Ms*g/(lf+lr);
 
 %STEP3: Use magic tire to calculate Fx and Fy for each tire
@@ -45,9 +47,8 @@ Fxfr = Fx_r/3;
 Fyfr = magic_tire(alpha_fr, Fzf);
 Fyr = magic_tire(alpha_r, Fzr);
 
-Fyfl = 0;
-Fyfr = 0;
-Fyr = 0;
+
+
 
 %STEP4: Calculate XF and XY for each tire (eq.7, 8)
 XFfl = Fxfl * cos(delta) - Fyfl * sin(delta);
@@ -80,6 +81,41 @@ vzd = 0;
 % theta_new = theta + timespan * thetad;
 % psi_new = psi + timespan * psid;
 
+
+if(SIM.t > 99 && ~SIM.done && SIM.debug)
+    SIM.done = true;
+    disp("===============")
+    disp("delta:")
+    disp(delta)
+    disp("vx:")
+    disp(vx)
+    disp("vy:")
+    disp(vy)
+    disp("psid:")
+    disp(psid)
+    disp("phid:")
+    disp(phid)
+    disp("Fyfl:")
+    disp(Fyfl)
+    disp("Fyfr:")
+    disp(Fyfr)
+    disp("alpha_r:")
+    disp(alpha_r)
+    disp("alpha_fl:")
+    disp(alpha_fl)
+    disp("t:")
+    disp(SIM.t)
+    pause(0.5)
+    disp("(YFfl+YFfr)*lf")
+    disp((YFfl+YFfr)*lf)
+    disp("YFr*lr")
+    disp(YFr*lr)
+    disp("Fzr")
+    disp(Fzr)
+    disp("Fzf")
+    disp(Fzf)
+    disp("=====END======")
+end
 
 X = zeros(6,1);
 X(1) = vxd;
