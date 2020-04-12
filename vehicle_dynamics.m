@@ -1,8 +1,15 @@
-function [vxd, vyd, vzd,...
-          phidd, thetadd, psidd] ...
+
+function [X] ...
         = vehicle_dynamics(vx, vy, vz,...
                            phid, thetad, psid,...
                            Fx_r, delta)
+
+
+% function [vxd, vyd, vzd,...
+%           phidd, thetadd, psidd] ...
+%         = vehicle_dynamics(vx, vy, vz,...
+%                            phid, thetad, psid,...
+%                            Fx_r, delta)
 
 % % states:           vx, vy, vz, vxd, vyd, vzd, phi, theta, psi, phid, thetad, psid
 % %                   vx, velocity in x direction
@@ -32,29 +39,35 @@ Fzf = lf*Ms*g/(lf+lr);
 Fzr = lr*Ms*g/(lf+lr);
 
 %STEP3: Use magic tire to calculate Fx and Fy for each tire
-Fxfl = 0;
+Fxfl = Fx_r/3;
 Fyfl = magic_tire(alpha_fl, Fzf);
-Fxfr = 0;
+Fxfr = Fx_r/3;
 Fyfr = magic_tire(alpha_fr, Fzf);
 Fyr = magic_tire(alpha_r, Fzr);
+
+Fyfl = 0;
+Fyfr = 0;
+Fyr = 0;
 
 %STEP4: Calculate XF and XY for each tire (eq.7, 8)
 XFfl = Fxfl * cos(delta) - Fyfl * sin(delta);
 YFfl = Fyfl * cos(delta) + Fxfl * sin(delta);
 XFfr = Fxfr * cos(delta) - Fyfr * sin(delta);
 YFfr = Fyfr * cos(delta) + Fxfr * sin(delta);
-XFr = Fx_r;
+XFr = Fx_r/3;
 YFr = Fyr;
 
 %STEP5a: Calculate double dot of phi, theta, psi (eq.22, 23, 24)
 phidd = (1/Isxx)*((Isyy-Iszz)*thetad*psid-(YFfl+YFfr+YFr)*h);
 thetadd = (1/Isyy)*((Iszz-Isxx)*thetad*psid+Fzr*lr-Fzf*lf+(XFfl+XFfr+XFr)*h);
 psidd = (1/Iszz)*((Isxx-Isyy)*phid*thetad+(XFfl-XFfr)*Tf/2+(YFfl+YFfr)*lf-YFr*lr);  % to add self-aligning torque Mzi
-
+thetadd = 0;
+phidd = 0;
 %STEP5b: Calculate dot of vx, vy, vz (eq.19, 20, 21)
 vxd = (XFfl+XFfr+XFr)/Mt-thetad*vz+psid*vy;
 vyd = (YFfl+YFfr+YFr)/Mt-psid*vx+phid*vz;
 vzd = (Fzf+Fzr)/Ms-phid*vy+thetad*vx;
+vzd = 0;
 
 %STEP6: Update rest of the states
 % vx_new = vx + timespan * vxd;
@@ -66,6 +79,15 @@ vzd = (Fzf+Fzr)/Ms-phid*vy+thetad*vx;
 % phi_new = phi + timespan * phid_new;
 % theta_new = theta + timespan * thetad;
 % psi_new = psi + timespan * psid;
+
+
+X = zeros(6,1);
+X(1) = vxd;
+X(2) = vyd;
+X(3) = vzd;
+X(4) = phidd;
+X(5) = thetadd;
+X(6) = psidd;
 
 end
 
