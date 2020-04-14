@@ -1,8 +1,8 @@
 
-function [X] ...
+function [Xdot] ...
         = vehicle_dynamics(vx, vy, vz,...
                            phid, thetad, psid,...
-                           Fx_r, delta)
+                           psi, Fx_r, delta)
 
 
 global SIM
@@ -28,7 +28,7 @@ Ms = 80; Mt = 89;   % vehicle sprung mass / total mass
 r = 0.40; % [   | ]  % Ratio of front wheel to COG from total vehicle length
 l_tot = 1.8;        % Need to be final
 lf = r*l_tot; lr = (1-r)*l_tot; % distance in x direction: front/rear wheel axis to COG
-Isxx = 800; Isyy = 1000; Iszz = 4000;  % Inertia to be estimated [EXPERIMENTAL]
+Isxx = 800; Isyy = 1000; Iszz = 2000;  % Inertia to be estimated [EXPERIMENTAL]
                                      % TREAT IT AS A CUBE AND GET ROUGHT Inertai's
 
 %STEP1: Calculate Slip Angle (eq.25)
@@ -36,26 +36,29 @@ alpha_fl = atan2((vy+lf*psid),(vx+Tf*psid/2))-delta; %front left
 alpha_fr = atan2((vy+lf*psid),(vx+Tf*psid/2))-delta; %front right
 alpha_r = atan2((vy-lr*psid),vx); %rear
 
+
+alpha_fl = -alpha_fl;
+alpha_fr = -alpha_fr;
+alpha_r = -alpha_r;
+
+
 %STEP2: Calculate Fzf and Fzr (reference: Rob535 HW2)
 Fzf = lf*Ms*g/(lf+lr)/2;
 Fzr = lr*Ms*g/(lf+lr);
 
 %STEP3: Use magic tire to calculate Fx and Fy for each tire
-Fxfl = Fx_r/3;
+Fxfl = 0;
 Fyfl = magic_tire(alpha_fl, Fzf);
-Fxfr = Fx_r/3;
+Fxfr = 0;
 Fyfr = magic_tire(alpha_fr, Fzf);
 Fyr = magic_tire(alpha_r, Fzr);
-
-
-
 
 %STEP4: Calculate XF and XY for each tire (eq.7, 8)
 XFfl = Fxfl * cos(delta) - Fyfl * sin(delta);
 YFfl = Fyfl * cos(delta) + Fxfl * sin(delta);
 XFfr = Fxfr * cos(delta) - Fyfr * sin(delta);
 YFfr = Fyfr * cos(delta) + Fxfr * sin(delta);
-XFr = Fx_r/3;
+XFr = Fx_r;
 YFr = Fyr;
 
 %STEP5a: Calculate double dot of phi, theta, psi (eq.22, 23, 24)
@@ -69,18 +72,6 @@ vxd = (XFfl+XFfr+XFr)/Mt-thetad*vz+psid*vy;
 vyd = (YFfl+YFfr+YFr)/Mt-psid*vx+phid*vz;
 vzd = (Fzf+Fzr)/Ms-phid*vy+thetad*vx;
 vzd = 0;
-
-%STEP6: Update rest of the states
-% vx_new = vx + timespan * vxd;
-% vy_new = vy + timespan * vyd;
-% vz_new = vz + timespan * vzd;
-% phid_new = phid + timespan * phidd;
-% thetad_new = thetad + timespan * thetadd;
-% psid_new = psid + timespan * psidd;
-% phi_new = phi + timespan * phid_new;
-% theta_new = theta + timespan * thetad;
-% psi_new = psi + timespan * psid;
-
 
 if(SIM.t > 99 && ~SIM.done && SIM.debug)
     SIM.done = true;
@@ -117,13 +108,15 @@ if(SIM.t > 99 && ~SIM.done && SIM.debug)
     disp("=====END======")
 end
 
-X = zeros(6,1);
-X(1) = vxd;
-X(2) = vyd;
-X(3) = vzd;
-X(4) = phidd;
-X(5) = thetadd;
-X(6) = psidd;
-
+Xdot = zeros(6,1);
+Xdot(1) = vxd;
+Xdot(2) = vyd;
+Xdot(3) = vzd;
+Xdot(4) = phidd;
+Xdot(5) = thetadd;
+Xdot(6) = psidd;
+Xdot(7) = vx*cos(psi) - vy*sin(psi);
+Xdot(8) = vx*sin(psi) + vy*cos(psi);
+Xdot(9) = psid;
 end
 
