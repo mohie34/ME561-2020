@@ -65,8 +65,14 @@ YFr = Fyr;
 phidd = (1/Isxx)*((Isyy-Iszz)*thetad*psid-(YFfl+YFfr+YFr)*h);
 thetadd = (1/Isyy)*((Iszz-Isxx)*thetad*psid+Fzr*lr-Fzf*lf+(XFfl+XFfr+XFr)*h);
 psidd = (1/Iszz)*((Isxx-Isyy)*phid*thetad+(XFfl-XFfr)*Tf/2+(YFfl+YFfr)*lf-YFr*lr);  % to add self-aligning torque Mzi
-thetadd = 0;
-phidd = 0;
+
+if ~SIM.enable_pitch
+    thetadd = 0;
+end
+if ~SIM.enable_roll
+    phidd = 0;
+end
+
 %STEP5b: Calculate dot of vx, vy, vz (eq.19, 20, 21)
 vxd = (XFfl+XFfr+XFr)/Mt-thetad*vz+psid*vy;
 vyd = (YFfl+YFfr+YFr)/Mt-psid*vx+phid*vz;
@@ -117,6 +123,8 @@ Xdot(5) = thetadd;
 Xdot(6) = psidd;
 Xdot(7) = vx*cos(psi) - vy*sin(psi);
 Xdot(8) = vx*sin(psi) + vy*cos(psi);
-Xdot(9) = psid;
+Xdot(9) = phid;
+Xdot(10) = psid;
+
 end
 
