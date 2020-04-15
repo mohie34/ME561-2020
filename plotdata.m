@@ -5,10 +5,8 @@ global DATA
 global CONTROL
 
 subplot(3,4,1)
-plot(DATA.T_vec,DATA.X_sim(:,1))
-hold on
-
-title("Vx [m/s]")
+plot(DATA.T_vec,DATA.X_sim(:,1)*2.23694)
+title("Vx [mph]")
 subplot(3,4,2)
 plot(DATA.T_vec,DATA.X_sim(:,2))
 title("Vy [m/s]")
@@ -27,6 +25,7 @@ title("Psid [deg/s]")
 subplot(3,4,7)
 plot(DATA.X_sim(:,7),DATA.X_sim(:,8),'k')
 title("Trajectory X(t) vs Y(t)")
+axis equal
 subplot(3,4,8)
 plot(DATA.T_vec,DATA.X_sim(:,9)*180/pi,'k')
 title("Trike Roll Phi [deg]")

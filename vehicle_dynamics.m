@@ -2,7 +2,7 @@
 function [Xdot] ...
         = vehicle_dynamics(vx, vy, vz,...
                            phid, thetad, psid,...
-                           psi, Fx_r, delta, phi)
+                           phi, psi, Fx_r, delta)
 
 
 global SIM
@@ -22,13 +22,13 @@ global SIM
 
 % Hard coded parameters
 g = 9.81;           % m/s^2 [FINAL]
-h = 0.4;            % height of COG Affects PHI for roll [EXPERMINTAL]
+h = 1.1;            % height of COG Affects PHI for roll [EXPERMINTAL]
 Tf = 0.86;          % distance between front wheel [m] [FINAL]
 Ms = 80; Mt = 89;   % vehicle sprung mass / total mass 
 r = 0.40; % [   | ]  % Ratio of front wheel to COG from total vehicle length
 l_tot = 1.8;        % Need to be final
 lf = r*l_tot; lr = (1-r)*l_tot; % distance in x direction: front/rear wheel axis to COG
-Isxx = 800; Isyy = 1000; Iszz = 2000;  % Inertia to be estimated [EXPERIMENTAL]
+Isxx = 50; Isyy = 400; Iszz = 400;  % Inertia to be estimated [EXPERIMENTAL]
                                      % TREAT IT AS A CUBE AND GET ROUGHT Inertai's
 
 %STEP1: Calculate Slip Angle (eq.25)
@@ -44,23 +44,22 @@ alpha_r = -alpha_r;
 
 %STEP2: Calculate Fzf and Fzr (reference: Rob535 HW2)
 Fzr = lr*Ms*g/(lf+lr);
-
 Fzf = lf*Ms*g/(lf+lr);
 Fzfl = lf*Ms*g/(lf+lr)/2;
 Fzfr = lf*Ms*g/(lf+lr)/2;
-% if abs(phi)<0.01
-%     Fz_balance_rate = phi/0.01;
-%     Fzfr = Fzfr*(1+Fz_balance_rate);
-%     Fzfl = Fzfl*(1-Fz_balance_rate);
-% elseif phi<0
-% %     disp("right wheel ungrounded")
-%     Fzfl = Fzf*cos(phi);
-%     Fzfr = 0;
-% elseif phi > 0
-% %     disp("left wheel ungrounded")
-%     Fzfl = 0;
-%     Fzfr = Fzf*cos(phi);
-% end
+if abs(phi)<0.01
+    Fz_balance_rate = phi/0.01;
+    Fzfr = Fzfr*(1+Fz_balance_rate);
+    Fzfl = Fzfl*(1-Fz_balance_rate);
+elseif phi<0
+    disp("right wheel ungrounded")
+    Fzfl = Fzf*cos(phi);
+    Fzfr = 0;
+elseif phi > 0
+    disp("left wheel ungrounded")
+    Fzfl = 0;
+    Fzfr = Fzf*cos(phi);
+end
 
 
 %STEP3: Use magic tire to calculate Fx and Fy for each tire
@@ -132,16 +131,16 @@ if(SIM.t > 99 && ~SIM.done && SIM.debug)
 end
 
 Xdot = zeros(6,1);
-Xdot(1) = vxd;
-Xdot(2) = vyd;
-Xdot(3) = vzd;
-Xdot(4) = phidd;
-Xdot(5) = thetadd;
-Xdot(6) = psidd;
-Xdot(7) = vx*cos(psi) - vy*sin(psi);
-Xdot(8) = vx*sin(psi) + vy*cos(psi);
-Xdot(9) = phid;
-Xdot(10) = psid;
+Xdot(1) = vxd;                       % vx
+Xdot(2) = vyd;                       % vy
+Xdot(3) = vzd;                       % vz
+Xdot(4) = phidd;                     % phid
+Xdot(5) = thetadd;                   % thetad
+Xdot(6) = psidd;                     % psid
+Xdot(7) = vx*cos(psi) - vy*sin(psi); % X
+Xdot(8) = vx*sin(psi) + vy*cos(psi); % Y
+Xdot(9) = phid;                      % phi
+Xdot(10) = psid;                     % psi
 
 end
 
