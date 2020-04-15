@@ -2,7 +2,7 @@
 function [Xdot] ...
         = vehicle_dynamics(vx, vy, vz,...
                            phid, thetad, psid,...
-                           psi, Fx_r, delta)
+                           psi, Fx_r, delta, phi)
 
 
 global SIM
@@ -43,8 +43,25 @@ alpha_r = -alpha_r;
 
 
 %STEP2: Calculate Fzf and Fzr (reference: Rob535 HW2)
-Fzf = lf*Ms*g/(lf+lr)/2;
 Fzr = lr*Ms*g/(lf+lr);
+
+Fzf = lf*Ms*g/(lf+lr);
+Fzfl = lf*Ms*g/(lf+lr)/2;
+Fzfr = lf*Ms*g/(lf+lr)/2;
+% if abs(phi)<0.01
+%     Fz_balance_rate = phi/0.01;
+%     Fzfr = Fzfr*(1+Fz_balance_rate);
+%     Fzfl = Fzfl*(1-Fz_balance_rate);
+% elseif phi<0
+% %     disp("right wheel ungrounded")
+%     Fzfl = Fzf*cos(phi);
+%     Fzfr = 0;
+% elseif phi > 0
+% %     disp("left wheel ungrounded")
+%     Fzfl = 0;
+%     Fzfr = Fzf*cos(phi);
+% end
+
 
 %STEP3: Use magic tire to calculate Fx and Fy for each tire
 Fxfl = 0;
@@ -62,7 +79,7 @@ XFr = Fx_r;
 YFr = Fyr;
 
 %STEP5a: Calculate double dot of phi, theta, psi (eq.22, 23, 24)
-phidd = (1/Isxx)*((Isyy-Iszz)*thetad*psid-(YFfl+YFfr+YFr)*h);
+phidd = (1/Isxx)*((Isyy-Iszz)*thetad*psid+(Fzfl-Fzfr)*Tf/2-(YFfl+YFfr+YFr)*h);
 thetadd = (1/Isyy)*((Iszz-Isxx)*thetad*psid+Fzr*lr-Fzf*lf+(XFfl+XFfr+XFr)*h);
 psidd = (1/Iszz)*((Isxx-Isyy)*phid*thetad+(XFfl-XFfr)*Tf/2+(YFfl+YFfr)*lf-YFr*lr);  % to add self-aligning torque Mzi
 

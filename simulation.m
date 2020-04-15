@@ -25,24 +25,25 @@ for t = T_vec
     SIM.done = false;
     if t>50
         if ~SIM.steered
-            input_vec = input_vec + [0.01, 0.001];
-%             SIM.steered = true;
-        else
+            input_vec = input_vec + [0, 4];
+            SIM.steered = true;
+        elseif t>55
             input_vec(2) = 0;
-            input_vec = input_vec + [0.1, 0.0];
+%             input_vec = input_vec + [0.1, 0.0];
         end
-    else
+    elseif ~stop
         input_vec = input_vec + [0.1, 0.0];
     end
     input_vec(2) = max(-0.3,min(input_vec(2),0.3));
     if input_vec(1) > 20
+        input_vec(1) = 0;
         stop = true;
     end
-    if stop
-        input_vec(1) = 0;
-        stop = false;
-    end
-    dynamics = @(t,X)(vehicle_dynamics(X(1),X(2),X(3),X(4),X(5),X(6),X(9),input_vec(1),input_vec(2)));
+%     if stop
+%         input_vec(1) = 0;
+%         stop = false;
+%     end
+    dynamics = @(t,X)(vehicle_dynamics(X(1),X(2),X(3),X(4),X(5),X(6),X(9),input_vec(1),input_vec(2), X(4)));
     [Tsim, Ysim] = ode45(dynamics, [t t+T_step], X_curr);
     X_curr = Ysim(end,:);
     X_sim = [X_sim; X_curr];
@@ -80,3 +81,6 @@ title("Trajectory X(t) vs Y(t)")
 subplot(3,4,10)
 plot(T_vec,X_sim(:,9),'r')
 title("Car Orientation Psi")
+subplot(3,4,11)
+plot(T_vec,X_sim(:,4),'g')
+title("Car Orientation Phi")
