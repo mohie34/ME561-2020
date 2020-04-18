@@ -5,7 +5,7 @@ RIGHT_TURN = true;
 STRAIGHT_LINE = true;
 STRAIGHT_LINE_DISTURBED = true;
 CHANGE_LINE = true;
-
+scale = 2;
 if RIGHT_TURN
     disp("gen right turn trajectory");
     x = 0:0.1:10;
@@ -43,9 +43,9 @@ end
 
 if CHANGE_LINE
     disp("gen change lane trajectory");
-    x = -50:0.2:50;
-    y = atan(x);
-    x = x * 5;
+    x = -50:0.5:50;
+    y = atan(1/scale*x);
+    x = scale*x;
     TRAJECTORY.change_lane = [x', y'];
     TRAJECTORY.change_lane = TRAJECTORY.change_lane - TRAJECTORY.change_lane(1, :);
 end

@@ -20,7 +20,7 @@ SIM.enable_roll = false;
 SIM.enable_pitch = false;
 SIM.limit_input = true;
 SIM.T_step = 0.1;
-SIM.Tsim = 130;  %Sim time in seconds
+SIM.Tsim = 500;  %Sim time in seconds
 SIM.x0 = [0;0;0;0;0;0;0;0;0;0]';
 SIM.lims.delta = 0.8;
 SIM.lims.Fx = 500;
@@ -31,17 +31,19 @@ global DATA
 DATA.X_sim = [];
 DATA.U_sim = [];
 DATA.T_sim = [];
-DATA.ref_sim = [];
+DATA.ref_y = [];
 DATA.X_curr = SIM.x0 ;
 DATA.T_vec = 0:SIM.T_step:SIM.Tsim-SIM.T_step;
 %==============================================%
 
 %=============={CONTROL INITS}=================%
 global CONTROL
-CONTROL.ref_vx = 4;
+CONTROL.ref_vx = 2;
+CONTROL.ref_y = 0;
 CONTROL.Fx = 0;
 CONTROL.delta = 0;
 CONTROL.init_cruise = false;
+CONTROL.init_lanechange = false;
 %==============================================%
 global TRAJECTORY
 traj_gen_pid_control();
@@ -52,14 +54,14 @@ for t = DATA.T_vec
     DATA.T_sim = [DATA.T_sim , t];
     SIM.done = false;
     %======================================================================
-    
-    %find goal point
-    goal_point = find_nearest_goal_point(TRAJECTORY.change_lane);
-    disp("goal_point");
-    disp(goal_point);
     % Get Control Inputs
-    get_lane_keeping(goal_point);
     getcruise_control(50,1,1)
+    get_lane_change(0.045,0.004,0.0002,...
+                     0.7, 0.0 , 0)
+    
+    if(t>100)
+        CONTROL.ref_y = 1;
+    end
     if(SIM.limit_input)
         CONTROL.delta = max(min(CONTROL.delta,SIM.lims.delta),-SIM.lims.delta);      
         CONTROL.Fx = max(min(CONTROL.Fx,SIM.lims.Fx),-SIM.lims.Fx);      
@@ -73,6 +75,7 @@ for t = DATA.T_vec
     DATA.X_curr = Y(end,:);
     DATA.X_sim = [DATA.X_sim; DATA.X_curr];
     DATA.U_sim = [DATA.U_sim; CONTROL.input_vec];
+    DATA.ref_y = [DATA.ref_y, CONTROL.ref_y];
     %======================================================================
 %     plotdata() % Check plotdata.m
 %     pause(0.00001)
@@ -82,4 +85,4 @@ for t = DATA.T_vec
     end
 end
 
-plotdata() % Check plotdata.m
+plotdata_notraj() % Check plotdata.m

@@ -6,6 +6,7 @@ global DATA
 
 % Update control error delta
 psi = DATA.X_curr(10);
+vx = DATA.X_curr(1);
 
 %Update position error
 err_x = goal_point(1)- DATA.X_curr(7);
@@ -14,18 +15,7 @@ err_alpha = atan2(err_y, err_x)-psi;
 disp("err_alpha");
 disp(err_alpha);
 
-% Update control error Vx
-vx = DATA.X_curr(1);
-err_vx = CONTROL.ref_vx - vx;
-disp("vx");
-disp(vx);
-
-% Apply control law
-CONTROL.Fx = 50*err_vx;
-disp("CONTROL.Fx");
-disp(CONTROL.Fx);
-
-k_delta = 0.3;
+k_delta = 0.35;
 if abs(vx)<1e-3 || abs(err_alpha) < 1e-3
     CONTROL.delta = 0;
 else

@@ -1,8 +1,7 @@
-function plotdata()
+function plotdata_notraj()
 %Plots the states contained within the DATA global struct
 
 global DATA
-global TRAJECTORY
 
 figure(1)
 subplot(3,4,1)
@@ -26,11 +25,7 @@ title("Psid [deg/s]")
 subplot(3,4,7)
 plot(DATA.X_sim(:,7),DATA.X_sim(:,8),'k','linewidth',1)
 hold on
-plot(TRAJECTORY.change_lane(:,1),TRAJECTORY.change_lane(:,2),'r')
-hold on
-plot(TRAJECTORY.change_lane(:,1),TRAJECTORY.change_lane(:,2)+0.35,'b')
-hold on
-plot(TRAJECTORY.change_lane(:,1),TRAJECTORY.change_lane(:,2)-0.35,'b')
+plot(DATA.X_sim(:,7),DATA.ref_y,'r')
 title("Trajectory X(t) vs Y(t)")
 % axis equal
 subplot(3,4,8)
@@ -45,6 +40,9 @@ title("Fxr")
 subplot(3,4,11)
 plot(DATA.T_sim,DATA.U_sim(:,2)*180/pi,'r')
 title("delta [deg]")
+subplot(3,4,12)
+plot(DATA.T_sim,DATA.X_sim(:,8),'b')
+title("y [m]")
 
 end
 
