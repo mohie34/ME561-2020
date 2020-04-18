@@ -26,7 +26,7 @@ disp("CONTROL.Fx");
 disp(CONTROL.Fx);
 
 k_delta = 0.3;
-if abs(vx)<1e-3 | abs(err_alpha) < 1e-3
+if abs(vx)<1e-3 || abs(err_alpha) < 1e-3
     CONTROL.delta = 0;
 else
     CONTROL.delta = atan(2*1.8*sin(err_alpha)/(k_delta*vx));
