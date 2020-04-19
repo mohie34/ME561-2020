@@ -18,7 +18,7 @@ global SIM
 % %                   vxd, derivative of vx
 % %                   phi, theta, psi are rotation angle in x, y, z direction respectively              
 % % input:            torque, rear wheel torque
-% %                   delta, front wheel steering angle
+% %                   delta, front wheels steering angle
 
 % Hard coded parameters
 g = 9.81;           % m/s^2 [FINAL]

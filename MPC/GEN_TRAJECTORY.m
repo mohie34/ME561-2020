@@ -1,4 +1,4 @@
-function  generate_trajectory()
+function  GEN_TRAJECTORY()
     global TRAJECTORY
     % generates a trajectory for MPC
     scale = 2;

@@ -1,4 +1,4 @@
-function update_waypoint()
+function UPDATE_WAYPOINT()
 %UPDATE_WAYPOINT update next waypoint target for the mpc controller
 %based on the L2 norm
 
@@ -20,7 +20,6 @@ function update_waypoint()
             if (TP.pos_indx == size(TRAJECTORY.center_line,1)) 
                 TP.last_pos = true;
                 disp("LAST WAYPOINT !!");
-                TP.waypoint_thresh = 5;
             end
         end
         TP.waypoint = TRAJECTORY.center_line(TP.pos_indx,:);

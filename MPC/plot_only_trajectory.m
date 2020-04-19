@@ -17,12 +17,14 @@ function plot_only_trajectory()
     plot(TRAJECTORY.bounds_right_upper(:,1),TRAJECTORY.bounds_right_upper(:,2), 'r')
     title("Trajectory X(t) vs Y(t)")
     % DRAW TARGET
-    for i = 1:size(TP.waypoints_completed,1)-1
-        hold on
-        wpt_done = TP.waypoints_completed(i,:);
-        plot(wpt_done(1),wpt_done(2),'gX')
-        circle_green(wpt_done(1),wpt_done(2), TP.waypoint_thresh);
-        axis equal
+    if(size(TP.waypoints_completed,1)>1)
+        for i = 2:size(TP.waypoints_completed,1)
+            hold on
+            wpt_done = TP.waypoints_completed(i,:);
+            plot(wpt_done(1),wpt_done(2),'gX')
+            circle_green(wpt_done(1),wpt_done(2), TP.waypoint_thresh);
+            axis equal
+        end
     end
     hold on
     plot(TP.waypoint(1),TP.waypoint(2),'gX')
