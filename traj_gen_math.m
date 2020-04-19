@@ -40,6 +40,8 @@ TRAJECTORY.bounds_left_upper = [xleft_upper',yleft_upper'];
 TRAJECTORY.bounds_right_lower = [xright_lower',yright_lower'];
 TRAJECTORY.bounds_right_upper = [xright_upper',yright_upper'];
 
+TRAJECTORY.start = TRAJECTORY.center_line(1,:);
+    
 plot(TRAJECTORY.center_line(:,1),TRAJECTORY.center_line(:,2))
 hold on
 plot(TRAJECTORY.bounds_left_lower(:,1),TRAJECTORY.bounds_left_lower(:,2), 'r')
