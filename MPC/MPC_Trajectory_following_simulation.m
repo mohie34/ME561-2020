@@ -39,8 +39,10 @@ global DATA
 DATA.X_sim = [];
 DATA.U_sim = [];
 DATA.T_sim = [];
+DATA.T_comp = [];
 DATA.ref_sim = [];
 DATA.X_curr = SIM.x0 ;
+DATA.T_curr = 0;
 DATA.T_vec = 0:SIM.T_step:SIM.Tsim-SIM.T_step;
 %===================================================%
 
@@ -66,22 +68,28 @@ TP.waypoint = TRAJECTORY.start;
 TP.waypoint_thresh = 0.5; % L2 Distance from trike to waypoint to update
 TP.update_thresh = 1.5;      % L2 Distance between two separate waypoints
 TP.trike_pos = DATA.X_curr(7:9);
-TP.last_pos = false;    % Boolen to indicate we going to last wp
+TP.last_pos = false;          % Boolen to indicate we going to last wp
+TP.reach_last_pos = false;    % Boolen to indicate we reached last wp
 TP.pos_indx = 1;
 TP.waypoints_completed = [];
 %===================================================%
 
-for t = DATA.T_vec
+while (~TP.reach_last_pos || DATA.T_curr == SIM.Tsim)
+    
     
     UPDATE_WAYPOINT();
     RUN_MPC_ITERATION();
-    SIMULATE_TRIKE(t);
-    
+    SIMULATE_TRIKE(DATA.T_curr);
     if(SIM.plot_realtime)
         plot_only_trajectory()
     end
-%     disp(CONTROL.U)
+    DATA.T_curr = DATA.T_curr + SIM.T_step;
+    disp(TP.reach_last_pos)
 end
+
+Tav_mpc = mean(DATA.T_comp);
+disp("AVERAGE MPC COMPUTATION TIME:")
+disp(Tav_mpc)
 
 plot_only_trajectory()
 plotdata_mpc() % Check plotdata.m

@@ -7,10 +7,13 @@ function RUN_MPC_ITERATION()
 
     x0 = DATA.X_curr;
     u0 = CONTROL.U_hori;
-    options = optimoptions('fmincon','MaxFunctionEvaluations',200);
+    options = optimoptions('fmincon','MaxFunctionEvaluations',1000);
+    tic
     CONTROL.U_hori = fmincon(@(u)nonl_cf(x0,u, TP.waypoint), u0, [], [],...
         [], [], [], [], @(u)nonl_bound_func(x0, u, SIM.Ulim) ,...
         options);
+    t_mpc = toc;
+    DATA.T_comp = [DATA.T_comp, t_mpc];
     CONTROL.U = CONTROL.U_hori(1:2);
     if(SIM.limit_input)    
         CONTROL.U(1) = abs(max(min(CONTROL.U(1),SIM.lims.Fx),-SIM.lims.Fx));  

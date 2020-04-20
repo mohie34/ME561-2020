@@ -51,8 +51,8 @@ subplot(3,4,11)
 plot(DATA.T_sim,DATA.U_sim(2:2:end)*180/pi,'r')
 title("delta [deg]")
 subplot(3,4,12)
-plot(DATA.T_sim,DATA.X_sim(:,8),'b')
-title("y [m]")
+plot(DATA.T_sim,DATA.T_comp*1000,'b')
+title("Computation Time [ms]")
 
 end
 

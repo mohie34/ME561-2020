@@ -28,9 +28,12 @@ function UPDATE_WAYPOINT()
     
     wp_dists = vecnorm((TRAJECTORY.center_line...
                                   -(TP.trike_pos(1:2)))');
-%     TRAJECTORY.center_line - TP.trike_pos(1:2)
-    [~,TP.closest_indx] =  min(vecnorm(wp_dists));
-    
+    [val,TP.closest_indx] =  min(wp_dists);
+    if (TP.closest_indx == size(TRAJECTORY.center_line,1)) 
+                disp(val)
+                TP.reach_last_pos = true;
+                disp("REACHED LAST WAYPOINT !!");
+    end
         
 end
 

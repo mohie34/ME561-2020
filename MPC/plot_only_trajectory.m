@@ -1,10 +1,11 @@
 function plot_only_trajectory()
 %Function to have the trajectory printing in a figure of its own
 
-    figure(2)
+    clf(figure(2))
     global DATA
     global TRAJECTORY
     global TP
+    
     
     plot(TRAJECTORY.center_line(:,1),TRAJECTORY.center_line(:,2),'b')
     hold on
@@ -37,7 +38,7 @@ end
 
 function h = circle_green(x,y,r)
     hold on
-    th = 0:pi/50:2*pi;
+    th = 0:pi/2:2*pi;
     xunit = r * cos(th) + x;
     yunit = r * sin(th) + y;
     h = plot(xunit, yunit,'g');
